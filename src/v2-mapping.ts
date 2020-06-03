@@ -331,156 +331,26 @@ export function handleRagequit(event: Ragequit): void {
   moloch.rageQuitCount = moloch.rageQuitCount.plus(BigInt.fromI32(1));
 
   moloch.save();
-
-  // let molochId = event.address.toHexString();
-  // let moloch = Moloch.load(molochId);
-  // let memberId = molochId
-  //   .concat("-member-")
-  //   .concat(event.params.memberAddress.toHex());
-  // let member = Member.load(memberId);
-  // let sharesAndLootToBurn = event.params.sharesToBurn.plus(
-  //   event.params.lootToBurn
-  // );
-  // let initialTotalSharesAndLoot = moloch.totalShares.plus(moloch.totalLoot);
-  // member.shares = member.shares.minus(event.params.sharesToBurn);
-  // member.loot = member.loot.minus(event.params.lootToBurn);
-  // moloch.totalShares = moloch.totalShares.minus(event.params.sharesToBurn);
-  // moloch.totalLoot = moloch.totalLoot.minus(event.params.lootToBurn);
-  // // set to doesn't exist if no shares?
-  // if (member.shares.equals(new BigInt(0))) {
-  //   member.exists = false;
-  // }
-  // // for each approved token, calculate the fairshare value and transfer from guildbank to user
-  // let tokens = moloch.approvedTokens;
-  // for (let i = 0; i < tokens.length; i++) {
-  //   let token: string = tokens[i];
-  //   let balance: TokenBalance | null = loadOrCreateTokenBalance(
-  //     molochId,
-  //     GUILD,
-  //     token
-  //   );
-  //   let balanceTimesBurn = balance.tokenBalance.times(sharesAndLootToBurn);
-  //   let amountToRageQuit = balanceTimesBurn.div(initialTotalSharesAndLoot);
-  //   internalTransfer(
-  //     molochId,
-  //     GUILD,
-  //     member.memberAddress,
-  //     token,
-  //     amountToRageQuit
-  //   );
-  // }
-  // addRageQuitBadge(event.params.memberAddress, event.transaction);
-  // member.save();
-  // moloch.save();
 }
 
-export function handleWithdraw(event: Withdraw): void {
-  // // let memberAddress = event.params.memberAddress;
-  // log.info(
-  //   "***********handleWithdraw tx {}, ammount, {}, from {}, memberAddress {}",
-  //   [
-  //     event.transaction.hash.toHex(),
-  //     event.params.amount.toString(),
-  //     event.transaction.from.toHex(),
-  //     event.params.memberAddress.toHex(),
-  //   ]
-  // );
-  // // if (
-  // //   event.transaction.hash.toHexString() ==
-  // //   "0x66372e97bcbcfae9810165f6a49479cacc04fd6a0f8054a9873cd90f766385e7"
-  // // ) {
-  // //   // NOTE: Used event.transaction.from instead of event.params.memberAddress
-  // //   // due to event on MCV where those didn't match and caused subtractFromBalance to fail
-  // //   log.info("FIND ME MCV bad tx", []);
-  // //   memberAddress = event.transaction.from;
-  // // }
-  // let molochId = event.address.toHexString();
-  // let tokenId = molochId.concat("-token-").concat(event.params.token.toHex());
-  // if (event.params.amount > BigInt.fromI32(0)) {
-  //   subtractFromBalance(
-  //     molochId,
-  //     event.params.memberAddress,
-  //     tokenId,
-  //     event.params.amount
-  //   );
-  // }
-}
+export function handleWithdraw(event: Withdraw): void {}
 
-export function handleTokensCollected(event: TokensCollected): void {
-  // let molochId = event.address.toHexString();
-  // let tokenId = molochId.concat("-token-").concat(event.params.token.toHex());
-  // addToBalance(molochId, GUILD, tokenId, event.params.amountToCollect);
-}
+export function handleTokensCollected(event: TokensCollected): void {}
 
 export function handleSummonCompleteLegacy(event: SummonComplete): void {
-  // let molochId = event.address.toHex();
-  // let moloch = new Moloch(molochId);
-  // moloch.title = "MetaCartel Ventures";
-  // moloch.version = "2";
-  // moloch.deleted = false;
-  // moloch.newContract = "1";
-  // let tokens = event.params.tokens;
-  // let approvedTokens: string[] = [];
-  // let escrowTokenBalance: string[] = [];
-  // let guildTokenBalance: string[] = [];
-  // for (let i = 0; i < tokens.length; i++) {
-  //   let token = tokens[i];
-  //   approvedTokens.push(createAndApproveToken(molochId, token));
-  //   escrowTokenBalance.push(createEscrowTokenBalance(molochId, token));
-  //   guildTokenBalance.push(createGuildTokenBalance(molochId, token));
-  // }
-  // // Start new Moloch instance
-  // moloch.summoner = event.params.summoner;
-  // moloch.summoningTime = event.params.summoningTime;
-  // moloch.periodDuration = event.params.periodDuration;
-  // moloch.votingPeriodLength = event.params.votingPeriodLength;
-  // moloch.gracePeriodLength = event.params.gracePeriodLength;
-  // moloch.proposalDeposit = event.params.proposalDeposit;
-  // moloch.dilutionBound = event.params.dilutionBound;
-  // moloch.processingReward = event.params.processingReward;
-  // moloch.depositToken = approvedTokens[0];
-  // moloch.approvedTokens = approvedTokens;
-  // moloch.guildTokenBalance = guildTokenBalance;
-  // moloch.escrowTokenBalance = escrowTokenBalance;
-  // moloch.totalShares = BigInt.fromI32(1);
-  // moloch.totalLoot = BigInt.fromI32(0);
-  // moloch.proposalCount = BigInt.fromI32(0);
-  // moloch.proposalQueueCount = BigInt.fromI32(0);
-  // moloch.proposedToJoin = new Array<string>();
-  // moloch.proposedToWhitelist = new Array<string>();
-  // moloch.proposedToKick = new Array<string>();
-  // moloch.proposedToFund = new Array<string>();
-  // moloch.proposedToTrade = new Array<string>();
-  // moloch.save();
-  // addSummonBadge(event.params.summoner, event.transaction);
-  // //Create member for summoner
-  // let memberId = molochId
-  //   .concat("-member-")
-  //   .concat(event.params.summoner.toHex());
-  // let newMember = new Member(memberId);
-  // newMember.moloch = molochId;
-  // newMember.createdAt = event.block.timestamp.toString();
-  // newMember.molochAddress = event.address;
-  // newMember.memberAddress = event.params.summoner;
-  // newMember.delegateKey = event.params.summoner;
-  // newMember.shares = BigInt.fromI32(1);
-  // newMember.loot = BigInt.fromI32(0);
-  // newMember.exists = true;
-  // newMember.tokenTribute = BigInt.fromI32(0);
-  // newMember.didRagequit = false;
-  // newMember.proposedToKick = false;
-  // newMember.kicked = false;
-  // newMember.save();
-  // addMembershipBadge(event.params.summoner);
-  // //Set summoner summoner balances for approved tokens to zero
-  // for (let i = 0; i < tokens.length; i++) {
-  //   let token = tokens[i];
-  //   let tokenId = molochId.concat("-token-").concat(token.toHex());
-  //   createMemberTokenBalance(
-  //     molochId,
-  //     event.params.summoner,
-  //     tokenId,
-  //     BigInt.fromI32(0)
-  //   );
-  // }
+  let molochId = event.address.toHex();
+  let moloch = new Moloch(molochId);
+  moloch.title = "MetaCartel Ventures";
+  moloch.version = "2";
+  moloch.deleted = false;
+  moloch.newContract = "1";
+  moloch.timestamp = event.block.timestamp.toString();
+  moloch.proposalCount = BigInt.fromI32(0);
+  moloch.memberCount = BigInt.fromI32(0);
+  moloch.voteCount = BigInt.fromI32(0);
+  moloch.rageQuitCount = BigInt.fromI32(0);
+  moloch.summoner = event.params.summoner;
+  moloch.summoningTime = event.params.summoningTime;
+
+  moloch.save();
 }

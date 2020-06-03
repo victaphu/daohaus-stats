@@ -81,18 +81,12 @@ dataSources:
           handler: handleSubmitProposal
         - event: SubmitVote(uint256,indexed uint256,indexed address,indexed address,uint8)
           handler: handleSubmitVote
-        - event: SponsorProposal(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleSponsorProposal
         - event: ProcessProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessProposal
         - event: ProcessGuildKickProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessGuildKickProposal
         - event: ProcessWhitelistProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessWhitelistProposal
-        - event: UpdateDelegateKey(indexed address,address)
-          handler: handleUpdateDelegateKey
-        - event: CancelProposal(indexed uint256,address)
-          handler: handleCancelProposal
         - event: Withdraw(indexed address,address,uint256)
           handler: handleWithdraw
         - event: Ragequit(indexed address,uint256,uint256)
@@ -120,6 +114,10 @@ dataSources:
       abis:
         - name: V1Moloch
           file: ./abis/V1Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Guildbank
+          file: ./abis/V1Guildbank.json
       eventHandlers:
         - event: SummonComplete(indexed address,uint256)
           handler: handleSummonCompleteLegacy
@@ -131,10 +129,6 @@ dataSources:
           handler: handleProcessProposal
         - event: Ragequit(indexed address,uint256)
           handler: handleRagequit
-        - event: Abort(indexed uint256,address)
-          handler: handleAbort
-        - event: UpdateDelegateKey(indexed address,address)
-          handler: handleUpdateDelegateKey
       file: ./src/v1-mapping.ts
   - kind: ethereum/contract
     name: MCDAO
@@ -156,6 +150,10 @@ dataSources:
       abis:
         - name: V1Moloch
           file: ./abis/V1Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Guildbank
+          file: ./abis/V1Guildbank.json
       eventHandlers:
         - event: SummonComplete(indexed address,uint256)
           handler: handleSummonCompleteLegacy
@@ -167,10 +165,6 @@ dataSources:
           handler: handleProcessProposal
         - event: Ragequit(indexed address,uint256)
           handler: handleRagequit
-        - event: Abort(indexed uint256,address)
-          handler: handleAbort
-        - event: UpdateDelegateKey(indexed address,address)
-          handler: handleUpdateDelegateKey
       file: ./src/v1-mapping.ts
 templates:
   - kind: ethereum/contract

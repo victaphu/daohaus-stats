@@ -239,13 +239,13 @@ export class Balance extends Entity {
     this.set("timestamp", Value.fromString(value));
   }
 
-  get value(): BigInt {
-    let value = this.get("value");
+  get balance(): BigInt {
+    let value = this.get("balance");
     return value.toBigInt();
   }
 
-  set value(value: BigInt) {
-    this.set("value", Value.fromBigInt(value));
+  set balance(value: BigInt) {
+    this.set("balance", Value.fromBigInt(value));
   }
 
   get shares(): BigInt {
@@ -299,5 +299,49 @@ export class Balance extends Entity {
 
   set moloch(value: string) {
     this.set("moloch", Value.fromString(value));
+  }
+
+  get amount(): BigInt | null {
+    let value = this.get("amount");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amount(value: BigInt | null) {
+    if (value === null) {
+      this.unset("amount");
+    } else {
+      this.set("amount", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get withdraw(): boolean {
+    let value = this.get("withdraw");
+    return value.toBoolean();
+  }
+
+  set withdraw(value: boolean) {
+    this.set("withdraw", Value.fromBoolean(value));
+  }
+
+  get deposit(): boolean {
+    let value = this.get("deposit");
+    return value.toBoolean();
+  }
+
+  set deposit(value: boolean) {
+    this.set("deposit", Value.fromBoolean(value));
+  }
+
+  get action(): string {
+    let value = this.get("action");
+    return value.toString();
+  }
+
+  set action(value: string) {
+    this.set("action", Value.fromString(value));
   }
 }

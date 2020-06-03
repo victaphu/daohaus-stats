@@ -18,10 +18,17 @@ type Moloch @entity {
 type Balance @entity {
   id: ID!
   timestamp: String!
-  value: BigInt!
+  balance: BigInt!
   shares: BigInt!
   loot: BigInt
   tokenAddress: Bytes!
   molochAddress: Bytes!
   moloch: Moloch!
+  withdraw: Boolean!
+  deposit: Boolean!
+  action: String!
+  """
+  cannot get amount on all events, could be null
+  """
+  amount: BigInt
 }

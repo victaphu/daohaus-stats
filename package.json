@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy-main": "node scripts/deploy-prep.js mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohausodyssy-automaton/daohaus-stats",
+    "deploy-main": "node scripts/deploy-prep.js mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohaus-stats",
     "deploy-kovan": "node scripts/deploy-prep.js kovan && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohaus-stats-kovan",
     "deploy-rinkeby": "node scripts/deploy-prep.js rinkeby && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ odyssy-automaton/daohaus-stats-rinkeby",
     "create-local": "graph create --node http://localhost:8020/ odyssy-automaton/daohaus",

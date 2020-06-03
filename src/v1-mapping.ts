@@ -9,10 +9,19 @@ import {
 } from "../generated/templates/MolochV1Template/V1Moloch";
 import { Erc20 as Token } from "../generated/templates/MolochV1Template/Erc20";
 import { Guildbank } from "../generated/templates/MolochV1Template/Guildbank";
-
 import { Moloch, Balance } from "../generated/schema";
 
-function addBalance(daoAddress: Address, block: EthereumBlock): void {
+// TODO: How to show:
+// Value in over-time
+// Value out over-time
+
+function addBalance(
+  daoAddress: Address,
+  block: EthereumBlock,
+  direction: string,
+  action: string,
+  amount: BigInt = BigInt.fromI32(0)
+): void {
   let contract = Contract.bind(daoAddress);
   let guildBankAddress = contract.guildBank();
   let guildBank = Guildbank.bind(guildBankAddress);
@@ -27,7 +36,7 @@ function addBalance(daoAddress: Address, block: EthereumBlock): void {
     .concat(tokenAddress.toHexString());
   let balance = new Balance(balanceId);
 
-  let balanceValue = token.try_balanceOf(daoAddress);
+  let balanceValue = token.try_balanceOf(guildBankAddress);
   if (balanceValue.reverted) {
     log.info(
       "balanceOf reverted daoAddress {}, tokenAddress, {}, guildBank, {}",
@@ -37,9 +46,9 @@ function addBalance(daoAddress: Address, block: EthereumBlock): void {
         guildBankAddress.toHexString(),
       ]
     );
-    balance.value = BigInt.fromI32(0);
+    balance.balance = BigInt.fromI32(0);
   } else {
-    balance.value = balanceValue.value;
+    balance.balance = balanceValue.value;
   }
 
   let sharesValue = contract.try_totalShares();
@@ -54,6 +63,20 @@ function addBalance(daoAddress: Address, block: EthereumBlock): void {
   balance.tokenAddress = tokenAddress;
   balance.molochAddress = daoAddress;
   balance.moloch = daoAddress.toHex();
+  balance.withdraw = direction == "withdraw";
+  balance.deposit = direction == "deposit";
+  balance.action = action;
+
+  balance.amount = amount;
+  if (action == "rageQuit") {
+    let shareValue = balance.shares.div(balance.balance);
+    balance.amount = amount.times(shareValue);
+    log.info("rageQuit shareValue, shares, amount {}", [
+      shareValue.toString(),
+      amount.toString(),
+      balance.amount.toString(),
+    ]);
+  }
 
   balance.save();
 }
@@ -70,6 +93,8 @@ export function handleSummonComplete(event: SummonComplete): void {
   moloch.summoningTime = contract.summoningTime();
   moloch.guildBankAddress = guildBankAddress;
   moloch.save();
+
+  addBalance(event.address, event.block, "initial", "summon");
 }
 
 export function handleSubmitProposal(event: SubmitProposal): void {
@@ -97,7 +122,17 @@ export function handleSubmitVote(event: SubmitVote): void {
 }
 
 export function handleProcessProposal(event: ProcessProposal): void {
-  addBalance(event.address, event.block);
+  // if (event.params.didPass && event.params.tokenTribute > BigInt.fromI32(0)) {
+
+  if (event.params.didPass) {
+    addBalance(
+      event.address,
+      event.block,
+      "deposit",
+      "processProposal",
+      event.params.tokenTribute
+    );
+  }
 }
 
 export function handleRagequit(event: Ragequit): void {
@@ -111,56 +146,38 @@ export function handleRagequit(event: Ragequit): void {
 
   moloch.save();
 
-  addBalance(event.address, event.block);
+  addBalance(
+    event.address,
+    event.block,
+    "withdraw",
+    "rageQuit",
+    event.params.sharesToBurn
+  );
 }
 
-// export function handleSummonCompleteLegacy(event: SummonComplete): void {
-//   let molochId = event.address.toHex();
-//   let moloch = new Moloch(molochId);
+export function handleSummonCompleteLegacy(event: SummonComplete): void {
+  let molochId = event.address.toHex();
+  let moloch = new Moloch(molochId);
 
-//   let title =
-//     event.address.toHex() == "0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1"
-//       ? "Moloch DAO"
-//       : "MetaCartel DAO";
-//   moloch.title = title;
+  let title =
+    event.address.toHex() == "0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1"
+      ? "Moloch DAO"
+      : "MetaCartel DAO";
+  moloch.title = title;
 
-//   moloch.newContract = "1";
-//   moloch.version = "1";
-//   moloch.deleted = false;
-//   moloch.summoner = event.params.summoner;
+  moloch.newContract = "1";
+  moloch.version = "1";
+  moloch.deleted = false;
+  moloch.summoner = event.params.summoner;
+  moloch.timestamp = event.block.timestamp.toString();
+  moloch.proposalCount = BigInt.fromI32(0);
+  moloch.memberCount = BigInt.fromI32(0);
+  moloch.voteCount = BigInt.fromI32(0);
+  moloch.rageQuitCount = BigInt.fromI32(0);
 
-//   let approvedTokens: string[] = [];
-//   moloch.approvedTokens = approvedTokens;
+  let contract = Contract.bind(event.address);
+  moloch.summoningTime = contract.summoningTime();
+  moloch.guildBankAddress = contract.guildBank();
 
-//   let memberId = molochId
-//     .concat("-member-")
-//     .concat(event.params.summoner.toHex());
-
-//   let member = new Member(memberId);
-//   member.molochAddress = event.address;
-//   member.moloch = moloch.id;
-//   member.memberAddress = event.params.summoner;
-//   member.createdAt = event.block.timestamp.toString();
-//   member.delegateKey = event.params.summoner;
-//   member.shares = event.params.shares;
-//   member.exists = true;
-//   member.tokenTribute = BigInt.fromI32(0);
-//   member.didRagequit = false;
-//   member.save();
-
-//   addMembershipBadge(event.params.summoner);
-
-//   let contract = Contract.bind(event.address);
-//   moloch.periodDuration = contract.periodDuration();
-//   moloch.votingPeriodLength = contract.votingPeriodLength();
-//   moloch.gracePeriodLength = contract.gracePeriodLength();
-//   moloch.proposalDeposit = contract.proposalDeposit();
-//   moloch.dilutionBound = contract.dilutionBound();
-//   moloch.processingReward = contract.processingReward();
-//   moloch.summoningTime = contract.summoningTime();
-//   moloch.guildBankAddress = contract.guildBank();
-
-//   moloch.save();
-
-//   addSummonBadge(event.params.summoner, event.transaction);
-// }
+  moloch.save();
+}
