@@ -11,10 +11,6 @@ import { Erc20 as Token } from "../generated/templates/MolochV1Template/Erc20";
 import { Guildbank } from "../generated/templates/MolochV1Template/Guildbank";
 import { Moloch, Balance } from "../generated/schema";
 
-// TODO: How to show:
-// Value in over-time
-// Value out over-time
-
 function addBalance(
   daoAddress: Address,
   block: EthereumBlock,
@@ -51,33 +47,40 @@ function addBalance(
     balance.balance = balanceValue.value;
   }
 
-  let sharesValue = contract.try_totalShares();
-  if (balanceValue.reverted) {
+  let totalShares = contract.try_totalShares();
+  let shares = BigInt.fromI32(0);
+  if (totalShares.reverted) {
     log.info("totalShares reverted daoAddress {}", [daoAddress.toHexString()]);
-    balance.shares = BigInt.fromI32(0);
   } else {
-    balance.shares = sharesValue.value;
+    shares = totalShares.value;
   }
 
   balance.timestamp = block.timestamp.toString();
   balance.tokenAddress = tokenAddress;
   balance.molochAddress = daoAddress;
   balance.moloch = daoAddress.toHex();
-  balance.withdraw = direction == "withdraw";
-  balance.deposit = direction == "deposit";
+  balance.payment = direction == "payment";
+  balance.tribute = direction == "tribute";
   balance.action = action;
 
   balance.amount = amount;
   if (action == "rageQuit") {
-    let shareValue = balance.shares.div(balance.balance);
-    balance.amount = amount.times(shareValue);
-    log.info("rageQuit shareValue, shares, amount {}", [
-      shareValue.toString(),
-      amount.toString(),
-      balance.amount.toString(),
-    ]);
+    if (shares == BigInt.fromI32(0)) {
+      balance.amount = BigInt.fromI32(0);
+      balance.rageQuitAllShares = true;
+    } else {
+      let shareValue = balance.balance.div(shares as BigInt);
+      balance.amount = amount.times(shareValue);
+
+      log.info("rageQuit shareValue, shares, amount {}, {}, {}", [
+        shareValue.toString(),
+        amount.toString(),
+        balance.amount.toString(),
+      ]);
+    }
   }
 
+  balance.version = "1";
   balance.save();
 }
 
@@ -122,13 +125,11 @@ export function handleSubmitVote(event: SubmitVote): void {
 }
 
 export function handleProcessProposal(event: ProcessProposal): void {
-  // if (event.params.didPass && event.params.tokenTribute > BigInt.fromI32(0)) {
-
   if (event.params.didPass) {
     addBalance(
       event.address,
       event.block,
-      "deposit",
+      "tribute",
       "processProposal",
       event.params.tokenTribute
     );
@@ -149,7 +150,7 @@ export function handleRagequit(event: Ragequit): void {
   addBalance(
     event.address,
     event.block,
-    "withdraw",
+    "payment",
     "rageQuit",
     event.params.sharesToBurn
   );

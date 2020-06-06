@@ -248,32 +248,6 @@ export class Balance extends Entity {
     this.set("balance", Value.fromBigInt(value));
   }
 
-  get shares(): BigInt {
-    let value = this.get("shares");
-    return value.toBigInt();
-  }
-
-  set shares(value: BigInt) {
-    this.set("shares", Value.fromBigInt(value));
-  }
-
-  get loot(): BigInt | null {
-    let value = this.get("loot");
-    if (value === null) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set loot(value: BigInt | null) {
-    if (value === null) {
-      this.unset("loot");
-    } else {
-      this.set("loot", Value.fromBigInt(value as BigInt));
-    }
-  }
-
   get tokenAddress(): Bytes {
     let value = this.get("tokenAddress");
     return value.toBytes();
@@ -301,6 +275,33 @@ export class Balance extends Entity {
     this.set("moloch", Value.fromString(value));
   }
 
+  get payment(): boolean {
+    let value = this.get("payment");
+    return value.toBoolean();
+  }
+
+  set payment(value: boolean) {
+    this.set("payment", Value.fromBoolean(value));
+  }
+
+  get tribute(): boolean {
+    let value = this.get("tribute");
+    return value.toBoolean();
+  }
+
+  set tribute(value: boolean) {
+    this.set("tribute", Value.fromBoolean(value));
+  }
+
+  get action(): string {
+    let value = this.get("action");
+    return value.toString();
+  }
+
+  set action(value: string) {
+    this.set("action", Value.fromString(value));
+  }
+
   get amount(): BigInt | null {
     let value = this.get("amount");
     if (value === null) {
@@ -318,30 +319,124 @@ export class Balance extends Entity {
     }
   }
 
-  get withdraw(): boolean {
-    let value = this.get("withdraw");
+  get rageQuitAllShares(): boolean {
+    let value = this.get("rageQuitAllShares");
     return value.toBoolean();
   }
 
-  set withdraw(value: boolean) {
-    this.set("withdraw", Value.fromBoolean(value));
+  set rageQuitAllShares(value: boolean) {
+    this.set("rageQuitAllShares", Value.fromBoolean(value));
   }
 
-  get deposit(): boolean {
-    let value = this.get("deposit");
-    return value.toBoolean();
-  }
-
-  set deposit(value: boolean) {
-    this.set("deposit", Value.fromBoolean(value));
-  }
-
-  get action(): string {
-    let value = this.get("action");
+  get version(): string {
+    let value = this.get("version");
     return value.toString();
   }
 
-  set action(value: string) {
-    this.set("action", Value.fromString(value));
+  set version(value: string) {
+    this.set("version", Value.fromString(value));
+  }
+}
+
+export class ProposalDetail extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save ProposalDetail entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save ProposalDetail entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("ProposalDetail", id.toString(), this);
+  }
+
+  static load(id: string): ProposalDetail | null {
+    return store.get("ProposalDetail", id) as ProposalDetail | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get proposalId(): BigInt {
+    let value = this.get("proposalId");
+    return value.toBigInt();
+  }
+
+  set proposalId(value: BigInt) {
+    this.set("proposalId", Value.fromBigInt(value));
+  }
+
+  get moloch(): string {
+    let value = this.get("moloch");
+    return value.toString();
+  }
+
+  set moloch(value: string) {
+    this.set("moloch", Value.fromString(value));
+  }
+
+  get molochAddress(): Bytes {
+    let value = this.get("molochAddress");
+    return value.toBytes();
+  }
+
+  set molochAddress(value: Bytes) {
+    this.set("molochAddress", Value.fromBytes(value));
+  }
+
+  get tributeOffered(): BigInt {
+    let value = this.get("tributeOffered");
+    return value.toBigInt();
+  }
+
+  set tributeOffered(value: BigInt) {
+    this.set("tributeOffered", Value.fromBigInt(value));
+  }
+
+  get tributeToken(): Bytes {
+    let value = this.get("tributeToken");
+    return value.toBytes();
+  }
+
+  set tributeToken(value: Bytes) {
+    this.set("tributeToken", Value.fromBytes(value));
+  }
+
+  get paymentRequested(): BigInt {
+    let value = this.get("paymentRequested");
+    return value.toBigInt();
+  }
+
+  set paymentRequested(value: BigInt) {
+    this.set("paymentRequested", Value.fromBigInt(value));
+  }
+
+  get paymentToken(): Bytes {
+    let value = this.get("paymentToken");
+    return value.toBytes();
+  }
+
+  set paymentToken(value: Bytes) {
+    this.set("paymentToken", Value.fromBytes(value));
   }
 }

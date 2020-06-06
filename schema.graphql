@@ -19,16 +19,25 @@ type Balance @entity {
   id: ID!
   timestamp: String!
   balance: BigInt!
-  shares: BigInt!
-  loot: BigInt
   tokenAddress: Bytes!
   molochAddress: Bytes!
   moloch: Moloch!
-  withdraw: Boolean!
-  deposit: Boolean!
+  payment: Boolean!
+  tribute: Boolean!
   action: String!
-  """
-  cannot get amount on all events, could be null
-  """
   amount: BigInt
+  rageQuitAllShares: Boolean
+  version: String!
+}
+
+type ProposalDetail @entity {
+  id: ID!
+  createdAt: String!
+  proposalId: BigInt!
+  moloch: Moloch!
+  molochAddress: Bytes!
+  tributeOffered: BigInt!
+  tributeToken: Bytes!
+  paymentRequested: BigInt!
+  paymentToken: Bytes!
 }
