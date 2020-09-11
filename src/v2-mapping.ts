@@ -12,14 +12,24 @@ import {
   ProcessWhitelistProposal,
   ProcessGuildKickProposal,
   Ragequit,
-  Withdraw,
+  SponsorProposal,
   TokensCollected,
   SubmitProposal,
   SubmitVote,
 } from "../generated/templates/MolochV2Template/V2Moloch";
 import { Moloch, Balance, ProposalDetail } from "../generated/schema";
+import {
+  addVotedBadge,
+  addSummonBadge,
+  addRageQuitBadge,
+  addJailedCountBadge,
+  addProposalSubmissionBadge,
+  addProposalSponsorBadge,
+  addMembershipBadge,
+  addProposalProcessorBadge,
+} from "./badges";
 
-let GUILD = Address.fromString("0x000000000000000000000000000000000000beef");
+let GUILD = Address.fromString("0x000000000000000000000000000000000000dead");
 
 function getBalance(daoAddress: Address, tokenAddress: Bytes): BigInt {
   let contract = Contract.bind(daoAddress);
@@ -110,12 +120,15 @@ export function handleSubmitProposal(event: SubmitProposal): void {
   proposal.moloch = molochId;
   proposal.molochAddress = event.address;
   proposal.createdAt = event.block.timestamp.toString();
+  proposal.applicant = event.params.applicant;
   proposal.tributeOffered = event.params.tributeOffered;
   proposal.tributeToken = event.params.tributeToken;
   proposal.paymentRequested = event.params.paymentRequested;
   proposal.paymentToken = event.params.paymentToken;
 
   proposal.save();
+
+  addProposalSubmissionBadge(event.transaction.from, event.transaction);
 }
 
 export function handleProcessProposal(event: ProcessProposal): void {
@@ -148,6 +161,32 @@ export function handleProcessProposal(event: ProcessProposal): void {
       );
     }
   }
+
+  addProposalProcessorBadge(event.transaction.from, event.transaction);
+  // todo - we can't tell if this is a newMember proposal
+  // addMembershipBadge(proposal.applicant);
+}
+
+export function handleProcessWhitelistProposal(
+  event: ProcessWhitelistProposal
+): void {
+  addProposalProcessorBadge(event.transaction.from, event.transaction);
+}
+
+export function handleProcessGuildKickProposal(
+  event: ProcessGuildKickProposal
+): void {
+  addProposalProcessorBadge(event.transaction.from, event.transaction);
+
+  let molochId = event.address.toHexString();
+  let processProposalId = molochId
+    .concat("-proposal-")
+    .concat(event.params.proposalId.toString());
+  let proposal = ProposalDetail.load(processProposalId);
+
+  if (event.params.didPass) {
+    addJailedCountBadge(proposal.applicant, event.transaction);
+  }
 }
 
 export function handleSubmitVote(event: SubmitVote): void {
@@ -157,6 +196,16 @@ export function handleSubmitVote(event: SubmitVote): void {
   moloch.voteCount = moloch.voteCount.plus(BigInt.fromI32(1));
 
   moloch.save();
+
+  addVotedBadge(
+    event.params.memberAddress,
+    event.params.uintVote,
+    event.transaction
+  );
+}
+
+export function handleSponsorProposal(event: SponsorProposal): void {
+  addProposalSponsorBadge(event.params.memberAddress, event.transaction);
 }
 
 export function handleRagequit(event: Ragequit): void {
@@ -208,6 +257,8 @@ export function handleRagequit(event: Ragequit): void {
       );
     }
   }
+
+  addRageQuitBadge(event.params.memberAddress, event.transaction);
 }
 
 export function handleTokensCollected(event: TokensCollected): void {
@@ -237,4 +288,7 @@ export function handleSummonCompleteLegacy(event: SummonComplete): void {
   moloch.summoningTime = event.params.summoningTime;
 
   moloch.save();
+
+  addSummonBadge(event.params.summoner, event.transaction);
+  addMembershipBadge(event.params.summoner);
 }

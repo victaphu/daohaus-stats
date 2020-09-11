@@ -223,8 +223,14 @@ templates:
           handler: handleSubmitProposal
         - event: SubmitVote(uint256,indexed uint256,indexed address,indexed address,uint8)
           handler: handleSubmitVote
+        - event: SponsorProposal(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSponsorProposal
         - event: ProcessProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessProposal
+        - event: ProcessGuildKickProposal(indexed uint256,indexed uint256,bool)
+          handler: handleProcessGuildKickProposal
+        - event: ProcessWhitelistProposal(indexed uint256,indexed uint256,bool)
+          handler: handleProcessWhitelistProposal
         - event: Ragequit(indexed address,uint256,uint256)
           handler: handleRagequit
         - event: TokensCollected(indexed address,uint256)

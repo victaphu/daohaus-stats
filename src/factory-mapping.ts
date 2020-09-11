@@ -8,6 +8,7 @@ import { V1Moloch } from "../generated/templates/MolochV1Template/V1Moloch";
 
 import { MolochV1Template, MolochV2Template } from "../generated/templates";
 import { Moloch } from "../generated/schema";
+import { addSummonBadge, addMembershipBadge } from "./badges";
 
 export function handleRegisterV1(event: RegisterV1): void {
   if (event.params.newContract.toString() == "0") {
@@ -53,6 +54,9 @@ export function handleRegisterV2(event: RegisterV2): void {
   moloch.rageQuitCount = BigInt.fromI32(0);
 
   moloch.save();
+
+  addSummonBadge(event.params.summoner, event.transaction);
+  addMembershipBadge(event.params.summoner);
 }
 
 export function handleDelete(event: Delete): void {

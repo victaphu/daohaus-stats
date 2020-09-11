@@ -36,8 +36,25 @@ type ProposalDetail @entity {
   proposalId: BigInt!
   moloch: Moloch!
   molochAddress: Bytes!
+  applicant: Bytes!
   tributeOffered: BigInt!
   tributeToken: Bytes!
   paymentRequested: BigInt!
   paymentToken: Bytes!
+}
+
+type Badge @entity {
+  id: ID!
+  memberAddress: Bytes!
+  voteCount: BigInt!
+  summonCount: BigInt!
+  proposalSponsorCount: BigInt!
+  proposalSubmissionCount: BigInt!
+  proposalProcessorCount: BigInt!
+  rageQuitCount: BigInt!
+  jailedCount: BigInt!
+  memberships: BigInt!
+  dissents: BigInt!
+  assents: BigInt!
+  totalGas: BigInt!
 }

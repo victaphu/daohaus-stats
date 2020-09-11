@@ -10,6 +10,14 @@ import {
 import { Erc20 as Token } from "../generated/templates/MolochV1Template/Erc20";
 import { Guildbank } from "../generated/templates/MolochV1Template/Guildbank";
 import { Moloch, Balance } from "../generated/schema";
+import {
+  addVotedBadge,
+  addSummonBadge,
+  addRageQuitBadge,
+  addProposalSubmissionBadge,
+  addMembershipBadge,
+  addProposalProcessorBadge,
+} from "./badges";
 
 function addBalance(
   daoAddress: Address,
@@ -98,6 +106,8 @@ export function handleSummonComplete(event: SummonComplete): void {
   moloch.save();
 
   addBalance(event.address, event.block, "initial", "summon");
+  addSummonBadge(event.params.summoner, event.transaction);
+  addMembershipBadge(event.params.summoner);
 }
 
 export function handleSubmitProposal(event: SubmitProposal): void {
@@ -110,6 +120,8 @@ export function handleSubmitProposal(event: SubmitProposal): void {
   moloch.proposalCount = moloch.proposalCount.plus(BigInt.fromI32(1));
 
   moloch.save();
+
+  addProposalSubmissionBadge(event.params.memberAddress, event.transaction);
 }
 
 export function handleSubmitVote(event: SubmitVote): void {
@@ -122,6 +134,12 @@ export function handleSubmitVote(event: SubmitVote): void {
   moloch.voteCount = moloch.voteCount.plus(BigInt.fromI32(1));
 
   moloch.save();
+
+  addVotedBadge(
+    event.params.memberAddress,
+    event.params.uintVote,
+    event.transaction
+  );
 }
 
 export function handleProcessProposal(event: ProcessProposal): void {
@@ -134,6 +152,11 @@ export function handleProcessProposal(event: ProcessProposal): void {
       event.params.tokenTribute
     );
   }
+
+  addProposalProcessorBadge(event.transaction.from, event.transaction);
+
+  // todo - we can't tell if this is a newMember proposal
+  // addMembershipBadge(event.params.applicant);
 }
 
 export function handleRagequit(event: Ragequit): void {
@@ -154,6 +177,8 @@ export function handleRagequit(event: Ragequit): void {
     "rageQuit",
     event.params.sharesToBurn
   );
+
+  addRageQuitBadge(event.params.memberAddress, event.transaction);
 }
 
 export function handleSummonCompleteLegacy(event: SummonComplete): void {
@@ -181,4 +206,7 @@ export function handleSummonCompleteLegacy(event: SummonComplete): void {
   moloch.guildBankAddress = contract.guildBank();
 
   moloch.save();
+
+  addMembershipBadge(event.params.summoner);
+  addSummonBadge(event.params.summoner, event.transaction);
 }
