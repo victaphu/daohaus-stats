@@ -13,6 +13,7 @@ type Moloch @entity {
   voteCount: BigInt!
   rageQuitCount: BigInt!
   balances: [Balance!] @derivedFrom(field: "moloch")
+  totalGas: BigInt!
 }
 
 type Balance @entity {
@@ -57,4 +58,11 @@ type Badge @entity {
   dissents: BigInt!
   assents: BigInt!
   totalGas: BigInt!
+}
+
+type DaoMeta @entity {
+  id: ID!
+  title: String
+  version: String
+  newContract: String
 }

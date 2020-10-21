@@ -16,8 +16,9 @@ import {
   TokensCollected,
   SubmitProposal,
   SubmitVote,
+  Withdraw,
 } from "../generated/templates/MolochV2Template/V2Moloch";
-import { Moloch, Balance, ProposalDetail } from "../generated/schema";
+import { Moloch, Balance, ProposalDetail, DaoMeta } from "../generated/schema";
 import {
   addVotedBadge,
   addSummonBadge,
@@ -27,6 +28,7 @@ import {
   addProposalSponsorBadge,
   addMembershipBadge,
   addProposalProcessorBadge,
+  addGas,
 } from "./badges";
 
 let GUILD = Address.fromString("0x000000000000000000000000000000000000dead");
@@ -101,12 +103,39 @@ function addBalance(
   ]);
 }
 
+//legacy daos will trigger this, factory daos get created in factory-mapping.ts
+export function handleSummonComplete(event: SummonComplete): void {
+  let molochId = event.address.toHex();
+  let moloch = new Moloch(molochId);
+  let daoMeta = DaoMeta.load(molochId);
+
+  moloch.timestamp = event.block.timestamp.toString();
+  moloch.summoner = event.params.summoner;
+  moloch.summoningTime = event.params.summoningTime;
+  moloch.title = daoMeta.title;
+  moloch.version = daoMeta.version;
+  moloch.newContract = daoMeta.newContract;
+  moloch.deleted = false;
+  moloch.proposalCount = BigInt.fromI32(0);
+  moloch.memberCount = BigInt.fromI32(0);
+  moloch.voteCount = BigInt.fromI32(0);
+  moloch.rageQuitCount = BigInt.fromI32(0);
+  moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
+
+  moloch.save();
+
+  addSummonBadge(event.params.summoner, event.transaction);
+  addMembershipBadge(event.params.summoner);
+}
+
 export function handleSubmitProposal(event: SubmitProposal): void {
   let molochId = event.address.toHexString();
   let moloch = Moloch.load(molochId);
 
-  moloch.proposalCount = moloch.proposalCount.plus(BigInt.fromI32(1));
+  log.info("***handleSubmitProposal, {}", [molochId]);
 
+  moloch.proposalCount = moloch.proposalCount.plus(BigInt.fromI32(1));
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   // cache some proposal data for use in processProposal
@@ -163,6 +192,10 @@ export function handleProcessProposal(event: ProcessProposal): void {
   }
 
   addProposalProcessorBadge(event.transaction.from, event.transaction);
+
+  let moloch = Moloch.load(molochId);
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
   // todo - we can't tell if this is a newMember proposal
   // addMembershipBadge(proposal.applicant);
 }
@@ -171,6 +204,11 @@ export function handleProcessWhitelistProposal(
   event: ProcessWhitelistProposal
 ): void {
   addProposalProcessorBadge(event.transaction.from, event.transaction);
+
+  let molochId = event.address.toHexString();
+  let moloch = Moloch.load(molochId);
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
 }
 
 export function handleProcessGuildKickProposal(
@@ -187,6 +225,10 @@ export function handleProcessGuildKickProposal(
   if (event.params.didPass) {
     addJailedCountBadge(proposal.applicant, event.transaction);
   }
+
+  let moloch = Moloch.load(molochId);
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
 }
 
 export function handleSubmitVote(event: SubmitVote): void {
@@ -194,7 +236,7 @@ export function handleSubmitVote(event: SubmitVote): void {
   let moloch = Moloch.load(molochId);
 
   moloch.voteCount = moloch.voteCount.plus(BigInt.fromI32(1));
-
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   addVotedBadge(
@@ -206,6 +248,11 @@ export function handleSubmitVote(event: SubmitVote): void {
 
 export function handleSponsorProposal(event: SponsorProposal): void {
   addProposalSponsorBadge(event.params.memberAddress, event.transaction);
+
+  let molochId = event.address.toHexString();
+  let moloch = Moloch.load(molochId);
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
 }
 
 export function handleRagequit(event: Ragequit): void {
@@ -213,7 +260,7 @@ export function handleRagequit(event: Ragequit): void {
   let moloch = Moloch.load(molochId);
 
   moloch.rageQuitCount = moloch.rageQuitCount.plus(BigInt.fromI32(1));
-
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   let contract = Contract.bind(event.address);
@@ -261,6 +308,15 @@ export function handleRagequit(event: Ragequit): void {
   addRageQuitBadge(event.params.memberAddress, event.transaction);
 }
 
+export function handleWithdraw(event: Withdraw): void {
+  let molochId = event.address.toHexString();
+  let moloch = Moloch.load(molochId);
+
+  moloch.rageQuitCount = moloch.rageQuitCount.plus(BigInt.fromI32(1));
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
+}
+
 export function handleTokensCollected(event: TokensCollected): void {
   addBalance(
     event.address,
@@ -270,25 +326,11 @@ export function handleTokensCollected(event: TokensCollected): void {
     "tribute",
     "tokensCollected"
   );
-}
 
-export function handleSummonCompleteLegacy(event: SummonComplete): void {
-  let molochId = event.address.toHex();
-  let moloch = new Moloch(molochId);
-  moloch.title = "MetaCartel Ventures";
-  moloch.version = "2";
-  moloch.deleted = false;
-  moloch.newContract = "1";
-  moloch.timestamp = event.block.timestamp.toString();
-  moloch.proposalCount = BigInt.fromI32(0);
-  moloch.memberCount = BigInt.fromI32(0);
-  moloch.voteCount = BigInt.fromI32(0);
-  moloch.rageQuitCount = BigInt.fromI32(0);
-  moloch.summoner = event.params.summoner;
-  moloch.summoningTime = event.params.summoningTime;
+  let molochId = event.address.toHexString();
+  let moloch = Moloch.load(molochId);
 
+  moloch.rageQuitCount = moloch.rageQuitCount.plus(BigInt.fromI32(1));
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
-
-  addSummonBadge(event.params.summoner, event.transaction);
-  addMembershipBadge(event.params.summoner);
 }

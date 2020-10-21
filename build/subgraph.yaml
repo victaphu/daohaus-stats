@@ -106,6 +106,9 @@ templates:
         - name: V2Moloch
           file: MolochV2Template/abis/V2Moloch.json
       eventHandlers:
+        - event: SummonComplete(indexed
+            address,address[],uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSummonComplete
         - event: SubmitProposal(indexed
             address,uint256,uint256,uint256,address,uint256,address,string,bool[6],uint256,indexed
             address,indexed address)
@@ -120,6 +123,8 @@ templates:
           handler: handleProcessGuildKickProposal
         - event: ProcessWhitelistProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessWhitelistProposal
+        - event: Withdraw(indexed address,address,uint256)
+          handler: handleWithdraw
         - event: Ragequit(indexed address,uint256,uint256)
           handler: handleRagequit
         - event: TokensCollected(indexed address,uint256)

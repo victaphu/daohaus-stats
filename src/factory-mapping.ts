@@ -4,11 +4,9 @@ import {
   Register as RegisterV2,
   Delete,
 } from "../generated/V2Factory/V2Factory";
-import { V1Moloch } from "../generated/templates/MolochV1Template/V1Moloch";
-
 import { MolochV1Template, MolochV2Template } from "../generated/templates";
-import { Moloch } from "../generated/schema";
-import { addSummonBadge, addMembershipBadge } from "./badges";
+import { Moloch, DaoMeta } from "../generated/schema";
+import { addSummonBadge, addMembershipBadge, addGas } from "./badges";
 
 export function handleRegisterV1(event: RegisterV1): void {
   if (event.params.newContract.toString() == "0") {
@@ -16,23 +14,11 @@ export function handleRegisterV1(event: RegisterV1): void {
   }
   MolochV1Template.create(event.params.moloch);
 
-  let molochId = event.params.moloch.toHex();
-  let moloch = new Moloch(molochId);
-  moloch.timestamp = event.block.timestamp.toString();
-  moloch.summoner = event.params.summoner;
-  moloch.title = event.params.title;
-  moloch.newContract = event.params.newContract.toString();
-  moloch.version = "1";
-  moloch.deleted = false;
-  moloch.proposalCount = BigInt.fromI32(0);
-  moloch.memberCount = BigInt.fromI32(0);
-  moloch.voteCount = BigInt.fromI32(0);
-  moloch.rageQuitCount = BigInt.fromI32(0);
-
-  let contract = V1Moloch.bind(event.params.moloch);
-  moloch.summoningTime = contract.summoningTime();
-
-  moloch.save();
+  let daoMeta = new DaoMeta(event.params.moloch.toHex());
+  daoMeta.title = event.params.title;
+  daoMeta.version = "1";
+  daoMeta.newContract = event.params.newContract.toString();
+  daoMeta.save();
 }
 
 export function handleRegisterV2(event: RegisterV2): void {
@@ -40,6 +26,11 @@ export function handleRegisterV2(event: RegisterV2): void {
 
   let molochId = event.params.moloch.toHex();
   let moloch = new Moloch(molochId);
+  let daoMeta = new DaoMeta(event.params.moloch.toHex());
+  daoMeta.title = event.params.title;
+  daoMeta.version = "2";
+  daoMeta.newContract = "1";
+  daoMeta.save();
 
   moloch.timestamp = event.block.timestamp.toString();
   moloch.summoner = event.params.summoner;
@@ -52,6 +43,7 @@ export function handleRegisterV2(event: RegisterV2): void {
   moloch.memberCount = BigInt.fromI32(0);
   moloch.voteCount = BigInt.fromI32(0);
   moloch.rageQuitCount = BigInt.fromI32(0);
+  moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
 
   moloch.save();
 

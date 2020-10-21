@@ -9,7 +9,7 @@ import {
 } from "../generated/templates/MolochV1Template/V1Moloch";
 import { Erc20 as Token } from "../generated/templates/MolochV1Template/Erc20";
 import { Guildbank } from "../generated/templates/MolochV1Template/Guildbank";
-import { Moloch, Balance } from "../generated/schema";
+import { Moloch, Balance, DaoMeta } from "../generated/schema";
 import {
   addVotedBadge,
   addSummonBadge,
@@ -17,6 +17,7 @@ import {
   addProposalSubmissionBadge,
   addMembershipBadge,
   addProposalProcessorBadge,
+  addGas,
 } from "./badges";
 
 function addBalance(
@@ -94,15 +95,30 @@ function addBalance(
 
 export function handleSummonComplete(event: SummonComplete): void {
   let molochId = event.address.toHex();
-  let moloch = Moloch.load(molochId);
-  if (moloch.newContract == "0") {
+  let moloch = new Moloch(molochId);
+  let daoMeta = DaoMeta.load(molochId);
+  if (daoMeta.newContract == "0") {
     return;
   }
+
+  moloch.timestamp = event.block.timestamp.toString();
+  moloch.summoner = event.params.summoner;
+  moloch.title = daoMeta.title;
+  moloch.newContract = daoMeta.newContract;
+  moloch.version = daoMeta.version;
+  moloch.deleted = false;
+  moloch.proposalCount = BigInt.fromI32(0);
+  moloch.memberCount = BigInt.fromI32(0);
+  moloch.voteCount = BigInt.fromI32(0);
+  moloch.rageQuitCount = BigInt.fromI32(0);
+  moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
+  moloch.summoningTime = event.block.timestamp;
 
   let contract = Contract.bind(event.address);
   let guildBankAddress = contract.guildBank();
   moloch.summoningTime = contract.summoningTime();
   moloch.guildBankAddress = guildBankAddress;
+
   moloch.save();
 
   addBalance(event.address, event.block, "initial", "summon");
@@ -117,8 +133,10 @@ export function handleSubmitProposal(event: SubmitProposal): void {
     return;
   }
 
-  moloch.proposalCount = moloch.proposalCount.plus(BigInt.fromI32(1));
+  log.info("***handleSubmitProposal, {}", [molochId]);
 
+  moloch.proposalCount = moloch.proposalCount.plus(BigInt.fromI32(1));
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   addProposalSubmissionBadge(event.params.memberAddress, event.transaction);
@@ -132,7 +150,7 @@ export function handleSubmitVote(event: SubmitVote): void {
   }
 
   moloch.voteCount = moloch.voteCount.plus(BigInt.fromI32(1));
-
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   addVotedBadge(
@@ -155,6 +173,15 @@ export function handleProcessProposal(event: ProcessProposal): void {
 
   addProposalProcessorBadge(event.transaction.from, event.transaction);
 
+  let molochId = event.address.toHexString();
+  let moloch = Moloch.load(molochId);
+  if (moloch.newContract == "0") {
+    return;
+  }
+
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
+  moloch.save();
+
   // todo - we can't tell if this is a newMember proposal
   // addMembershipBadge(event.params.applicant);
 }
@@ -167,7 +194,7 @@ export function handleRagequit(event: Ragequit): void {
   }
 
   moloch.rageQuitCount = moloch.rageQuitCount.plus(BigInt.fromI32(1));
-
+  moloch.totalGas = addGas(moloch.totalGas, event.transaction);
   moloch.save();
 
   addBalance(
@@ -179,34 +206,4 @@ export function handleRagequit(event: Ragequit): void {
   );
 
   addRageQuitBadge(event.params.memberAddress, event.transaction);
-}
-
-export function handleSummonCompleteLegacy(event: SummonComplete): void {
-  let molochId = event.address.toHex();
-  let moloch = new Moloch(molochId);
-
-  let title =
-    event.address.toHex() == "0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1"
-      ? "Moloch DAO"
-      : "MetaCartel DAO";
-  moloch.title = title;
-
-  moloch.newContract = "1";
-  moloch.version = "1";
-  moloch.deleted = false;
-  moloch.summoner = event.params.summoner;
-  moloch.timestamp = event.block.timestamp.toString();
-  moloch.proposalCount = BigInt.fromI32(0);
-  moloch.memberCount = BigInt.fromI32(0);
-  moloch.voteCount = BigInt.fromI32(0);
-  moloch.rageQuitCount = BigInt.fromI32(0);
-
-  let contract = Contract.bind(event.address);
-  moloch.summoningTime = contract.summoningTime();
-  moloch.guildBankAddress = contract.guildBank();
-
-  moloch.save();
-
-  addMembershipBadge(event.params.summoner);
-  addSummonBadge(event.params.summoner, event.transaction);
 }

@@ -25,7 +25,7 @@ function loadOrCreateBadge(memberAddress: Bytes): Badge | null {
   return badge;
 }
 
-function addGas(currentGas: BigInt, tx: EthereumTransaction): BigInt {
+export function addGas(currentGas: BigInt, tx: EthereumTransaction): BigInt {
   let txCost = tx.gasPrice.times(tx.gasUsed);
   return currentGas.plus(txCost);
 }

@@ -69,9 +69,13 @@ dataSources:
       abis:
         - name: V1Moloch
           file: ./abis/V1Moloch.json
+        - name: Guildbank
+          file: ./abis/V1Guildbank.json
+        - name: Erc20
+          file: ./abis/Erc20.json
       eventHandlers:
         - event: "SummonComplete(indexed address,uint256)"
-          handler: handleLegacyRegistration
+          handler: handleSummonCompleteMoloch
       file: ./src/legacy-mapping.ts
 templates:
   - kind: ethereum/contract
@@ -132,6 +136,8 @@ templates:
         - name: V2Moloch
           file: ./abis/V2Moloch.json
       eventHandlers:
+        - event: SummonComplete(indexed address,address[],uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSummonComplete
         - event: SubmitProposal(indexed address,uint256,uint256,uint256,address,uint256,address,string,bool[6],uint256,indexed address,indexed address)
           handler: handleSubmitProposal
         - event: SubmitVote(uint256,indexed uint256,indexed address,indexed address,uint8)
@@ -144,6 +150,8 @@ templates:
           handler: handleProcessGuildKickProposal
         - event: ProcessWhitelistProposal(indexed uint256,indexed uint256,bool)
           handler: handleProcessWhitelistProposal
+        - event: Withdraw(indexed address,address,uint256)
+          handler: handleWithdraw
         - event: Ragequit(indexed address,uint256,uint256)
           handler: handleRagequit
         - event: TokensCollected(indexed address,uint256)
