@@ -18,6 +18,8 @@ import {
   SubmitVote,
   Withdraw,
 } from "../generated/templates/MolochV2Template/V2Moloch";
+import { Erc20 } from "../generated/templates/MolochV2Template/Erc20";
+import { Erc20Bytes32 } from "../generated/templates/MolochV2Template/Erc20Bytes32";
 import { Moloch, Balance, ProposalDetail, DaoMeta } from "../generated/schema";
 import {
   addVotedBadge,
@@ -93,7 +95,8 @@ function addBalance(
   balance.tribute = direction == "tribute";
   balance.action = action;
   balance.amount = amount;
-
+  balance.tokenSymbol = getTokenSymbol(tokenAddress);
+  balance.tokenDecimals = getTokenDecimals(tokenAddress);
   balance.version = "2";
   balance.save();
 
@@ -101,6 +104,34 @@ function addBalance(
     balance.amount.toString(),
     action,
   ]);
+}
+
+export function getTokenSymbol(token: Bytes): string {
+  let erc20 = Erc20.bind(token as Address);
+  let symbol = erc20.try_symbol();
+  if (symbol.reverted) {
+    let erc20Bytes32 = Erc20Bytes32.bind(token as Address);
+    let otherSymbol = erc20Bytes32.try_symbol();
+    if (otherSymbol.reverted) {
+      log.info("other symbol reverted token, {}", [token.toHexString()]);
+      return "wtf";
+    } else {
+      return otherSymbol.value.toString();
+    }
+  } else {
+    return symbol.value.toString();
+  }
+}
+
+export function getTokenDecimals(token: Bytes): BigInt {
+  let erc20 = Erc20.bind(token as Address);
+  let decimals = erc20.try_decimals();
+  if (decimals.reverted) {
+    log.info("decimals reverted token, {}", [token.toHexString()]);
+    return BigInt.fromI32(0);
+  } else {
+    return BigInt.fromI32(decimals.value);
+  }
 }
 
 //legacy daos will trigger this, factory daos get created in factory-mapping.ts

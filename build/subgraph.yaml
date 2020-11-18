@@ -69,6 +69,8 @@ templates:
           file: MolochV1Template/abis/V1Moloch.json
         - name: Erc20
           file: MolochV1Template/abis/Erc20.json
+        - name: Erc20Bytes32
+          file: MolochV1Template/abis/Erc20Bytes32.json
         - name: Guildbank
           file: MolochV1Template/abis/V1Guildbank.json
       eventHandlers:
@@ -105,6 +107,10 @@ templates:
       abis:
         - name: V2Moloch
           file: MolochV2Template/abis/V2Moloch.json
+        - name: Erc20
+          file: MolochV2Template/abis/Erc20.json
+        - name: Erc20Bytes32
+          file: MolochV2Template/abis/Erc20Bytes32.json
       eventHandlers:
         - event: SummonComplete(indexed
             address,address[],uint256,uint256,uint256,uint256,uint256,uint256,uint256)

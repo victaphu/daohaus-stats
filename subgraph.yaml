@@ -70,6 +70,8 @@ templates:
           file: ./abis/V1Moloch.json
         - name: Erc20
           file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
         - name: Guildbank
           file: ./abis/V1Guildbank.json
       eventHandlers:
@@ -108,6 +110,10 @@ templates:
       abis:
         - name: V2Moloch
           file: ./abis/V2Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
       eventHandlers:
         - event: >-
             SummonComplete(indexed

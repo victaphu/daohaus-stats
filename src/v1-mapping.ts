@@ -19,6 +19,7 @@ import {
   addProposalProcessorBadge,
   addGas,
 } from "./badges";
+import { getTokenDecimals, getTokenSymbol } from "./v2-mapping";
 
 function addBalance(
   daoAddress: Address,
@@ -88,7 +89,8 @@ function addBalance(
       ]);
     }
   }
-
+  balance.tokenSymbol = getTokenSymbol(tokenAddress);
+  balance.tokenDecimals = getTokenDecimals(tokenAddress);
   balance.version = "1";
   balance.save();
 }

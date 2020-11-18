@@ -29,6 +29,8 @@ type Balance @entity {
   amount: BigInt
   rageQuitAllShares: Boolean
   version: String!
+  tokenSymbol: String
+  tokenDecimals: BigInt
 }
 
 type ProposalDetail @entity {

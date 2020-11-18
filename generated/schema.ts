@@ -345,6 +345,40 @@ export class Balance extends Entity {
   set version(value: string) {
     this.set("version", Value.fromString(value));
   }
+
+  get tokenSymbol(): string | null {
+    let value = this.get("tokenSymbol");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenSymbol(value: string | null) {
+    if (value === null) {
+      this.unset("tokenSymbol");
+    } else {
+      this.set("tokenSymbol", Value.fromString(value as string));
+    }
+  }
+
+  get tokenDecimals(): BigInt | null {
+    let value = this.get("tokenDecimals");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tokenDecimals(value: BigInt | null) {
+    if (value === null) {
+      this.unset("tokenDecimals");
+    } else {
+      this.set("tokenDecimals", Value.fromBigInt(value as BigInt));
+    }
+  }
 }
 
 export class ProposalDetail extends Entity {
