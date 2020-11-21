@@ -379,6 +379,32 @@ export class Balance extends Entity {
       this.set("tokenDecimals", Value.fromBigInt(value as BigInt));
     }
   }
+
+  get currentShares(): BigInt {
+    let value = this.get("currentShares");
+    return value.toBigInt();
+  }
+
+  set currentShares(value: BigInt) {
+    this.set("currentShares", Value.fromBigInt(value));
+  }
+
+  get currentLoot(): BigInt | null {
+    let value = this.get("currentLoot");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set currentLoot(value: BigInt | null) {
+    if (value === null) {
+      this.unset("currentLoot");
+    } else {
+      this.set("currentLoot", Value.fromBigInt(value as BigInt));
+    }
+  }
 }
 
 export class ProposalDetail extends Entity {

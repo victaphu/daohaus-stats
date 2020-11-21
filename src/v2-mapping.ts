@@ -54,6 +54,32 @@ function getBalance(daoAddress: Address, tokenAddress: Bytes): BigInt {
   return balance;
 }
 
+function getShares(daoAddress: Address): BigInt {
+  let contract = Contract.bind(daoAddress);
+  let shares = BigInt.fromI32(0);
+  let sharesValue = contract.try_totalShares();
+  if (sharesValue.reverted) {
+    log.info("totalShares reverted daoAddress, {}", [daoAddress.toHexString()]);
+  } else {
+    shares = sharesValue.value;
+  }
+
+  return shares;
+}
+
+function getLoot(daoAddress: Address): BigInt {
+  let contract = Contract.bind(daoAddress);
+  let loot = BigInt.fromI32(0);
+  let lootValue = contract.try_totalLoot();
+  if (lootValue.reverted) {
+    log.info("totalLoot reverted daoAddress, {}", [daoAddress.toHexString()]);
+  } else {
+    loot = lootValue.value;
+  }
+
+  return loot;
+}
+
 function addBalance(
   daoAddress: Address,
   block: EthereumBlock,
@@ -62,7 +88,6 @@ function addBalance(
   direction: string,
   action: string
 ): void {
-  // let contract = Contract.bind(daoAddress);
   let balanceId = daoAddress
     .toHex()
     .concat("-")
@@ -71,21 +96,9 @@ function addBalance(
     .concat(tokenAddress.toHexString());
   let balance = new Balance(balanceId);
 
-  // let balanceValue = contract.try_getUserTokenBalance(
-  //   GUILD,
-  //   tokenAddress as Address
-  // );
-  // if (balanceValue.reverted) {
-  //   log.info(
-  //     "balanceOf reverted v2 guildbank daoAddress {}, tokenAddress, {}",
-  //     [daoAddress.toHexString(), tokenAddress.toHexString()]
-  //   );
-  //   balance.balance = BigInt.fromI32(0);
-  // } else {
-  //   balance.balance = balanceValue.value;
-  // }
-
   balance.balance = getBalance(daoAddress, tokenAddress);
+  balance.currentShares = getShares(daoAddress);
+  balance.currentLoot = getLoot(daoAddress);
 
   balance.timestamp = block.timestamp.toString();
   balance.tokenAddress = tokenAddress;

@@ -31,6 +31,8 @@ type Balance @entity {
   version: String!
   tokenSymbol: String
   tokenDecimals: BigInt
+  currentShares: BigInt!
+  currentLoot: BigInt
 }
 
 type ProposalDetail @entity {

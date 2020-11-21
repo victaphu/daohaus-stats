@@ -21,6 +21,19 @@ import {
 } from "./badges";
 import { getTokenDecimals, getTokenSymbol } from "./v2-mapping";
 
+function getShares(daoAddress: Address): BigInt {
+  let contract = Contract.bind(daoAddress);
+  let shares = BigInt.fromI32(0);
+  let sharesValue = contract.try_totalShares();
+  if (sharesValue.reverted) {
+    log.info("totalShares reverted daoAddress, {}", [daoAddress.toHexString()]);
+  } else {
+    shares = sharesValue.value;
+  }
+
+  return shares;
+}
+
 function addBalance(
   daoAddress: Address,
   block: EthereumBlock,
@@ -89,6 +102,7 @@ function addBalance(
       ]);
     }
   }
+  balance.currentShares = getShares(daoAddress);
   balance.tokenSymbol = getTokenSymbol(tokenAddress);
   balance.tokenDecimals = getTokenDecimals(tokenAddress);
   balance.version = "1";
