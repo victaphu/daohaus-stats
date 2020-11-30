@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: V1Factory
-    network: kovan
+    network: rinkeby
     source:
-      address: '0x0C60Cd59f42093c7489BA68BAA4d7A01f2468153'
+      address: '0x610247467d0dfA8B477ad7Dd1644e86CB2a79F8F'
       abi: V1Factory
-      startBlock: 14980875
+      startBlock: 6494343
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -26,11 +26,11 @@ dataSources:
       file: ./src/factory-mapping.ts
   - kind: ethereum/contract
     name: V2Factory
-    network: kovan
+    network: rinkeby
     source:
-      address: '0xB47778d3BcCBf5e39dEC075CA5F185fc20567b1e'
+      address: '0x763b61A62EF076ad960E1d513713B2aeD7C1b88e'
       abi: V2Factory
-      startBlock: 16845360
+      startBlock: 6494329
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -51,7 +51,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: MolochV1Template
-    network: kovan
+    network: rinkeby
     source:
       abi: V1Moloch
     mapping:
@@ -91,7 +91,7 @@ templates:
           handler: handleRagequit
   - kind: ethereum/contract
     name: MolochV2Template
-    network: kovan
+    network: rinkeby
     source:
       abi: V2Moloch
     mapping:
