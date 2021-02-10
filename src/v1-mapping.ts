@@ -124,7 +124,7 @@ export function handleSummonComplete(event: SummonComplete): void {
   moloch.version = daoMeta.version;
   moloch.deleted = false;
   moloch.proposalCount = BigInt.fromI32(0);
-  moloch.memberCount = BigInt.fromI32(0);
+  moloch.memberCount = BigInt.fromI32(1);
   moloch.voteCount = BigInt.fromI32(0);
   moloch.rageQuitCount = BigInt.fromI32(0);
   moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
