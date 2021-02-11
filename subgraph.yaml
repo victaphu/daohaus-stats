@@ -87,10 +87,6 @@ dataSources:
       abis:
         - name: V1Moloch
           file: ./abis/V1Moloch.json
-        - name: Guildbank
-          file: ./abis/V1Guildbank.json
-        - name: Erc20
-          file: ./abis/Erc20.json
       eventHandlers:
         - event: 'SummonComplete(indexed address,uint256)'
           handler: handleSummonCompleteMoloch
@@ -212,6 +208,8 @@ templates:
       abis:
         - name: V21Moloch
           file: ./abis/V21Moloch.json
+        - name: V2Moloch
+          file: ./abis/V2Moloch.json
         - name: Erc20
           file: ./abis/Erc20.json
         - name: Erc20Bytes32
