@@ -80,7 +80,7 @@ function getLoot(daoAddress: Address): BigInt {
   return loot;
 }
 
-function addBalance(
+export function addBalance(
   daoAddress: Address,
   block: EthereumBlock,
   amount: BigInt,
@@ -167,6 +167,17 @@ export function handleSummonComplete(event: SummonComplete): void {
   moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
 
   moloch.save();
+
+  let eventTokens: Address[] = event.params.tokens;
+  let depoistToken: Address = eventTokens[0];
+  addBalance(
+    event.address,
+    event.block,
+    BigInt.fromI32(0),
+    depoistToken,
+    "initial",
+    "summon"
+  );
 
   addSummonBadge(event.params.summoner, event.transaction);
   addMembershipBadge(event.params.summoner);

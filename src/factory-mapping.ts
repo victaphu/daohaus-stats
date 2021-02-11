@@ -12,6 +12,7 @@ import {
 } from "../generated/templates";
 import { Moloch, DaoMeta } from "../generated/schema";
 import { addSummonBadge, addMembershipBadge, addGas } from "./badges";
+import { addBalance } from "./v2-mapping";
 
 export function handleRegisterV1(event: RegisterV1): void {
   if (event.params.newContract.toString() == "0") {
@@ -52,6 +53,17 @@ export function handleRegisterV2(event: RegisterV2): void {
 
   moloch.save();
 
+  let eventTokens: Address[] = event.params.tokens;
+  let depoistToken: Address = eventTokens[0];
+  addBalance(
+    event.params.moloch,
+    event.block,
+    BigInt.fromI32(0),
+    depoistToken,
+    "initial",
+    "summon"
+  );
+
   addSummonBadge(event.params.summoner, event.transaction);
   addMembershipBadge(event.params.summoner);
 }
@@ -82,6 +94,17 @@ export function handleSummonV21(event: SummonComplete): void {
   moloch.totalGas = addGas(BigInt.fromI32(0), event.transaction);
 
   moloch.save();
+
+  let eventTokens: Address[] = event.params.tokens;
+  let depoistToken: Address = eventTokens[0];
+  addBalance(
+    event.params.moloch,
+    event.block,
+    BigInt.fromI32(0),
+    depoistToken,
+    "initial",
+    "summon"
+  );
 
   for (let i = 0; i < eventSummoners.length; i++) {
     let summoner = eventSummoners[i];

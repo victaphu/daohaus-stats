@@ -40,6 +40,14 @@ dataSources:
       abis:
         - name: V2Factory
           file: ./abis/V2Factory.json
+        - name: V2Moloch
+          file: ./abis/V2Moloch.json
+        - name: V21Moloch
+          file: ./abis/V21Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
       eventHandlers:
         - event: >-
             Register(uint256,address,indexed
@@ -64,6 +72,14 @@ dataSources:
       abis:
         - name: V21Factory
           file: ./abis/V21Factory.json
+        - name: V2Moloch
+          file: ./abis/V2Moloch.json
+        - name: V21Moloch
+          file: ./abis/V21Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
       eventHandlers:
         - event: >-
             SummonComplete(indexed
