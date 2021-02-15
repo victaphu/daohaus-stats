@@ -34,6 +34,14 @@ const config = {
     v21FactoryAddress: "0x38064F40B20347d58b326E767791A6f79cdEddCe",
     v21FactoryStartBlock: 11499150,
   },
+  matic: {
+    v1FactoryAddress: "",
+    v1FactoryStartBlock: "",
+    v2FactoryAddress: "",
+    v2FactoryStartBlock: "",
+    v21FactoryAddress: "0x6690C139564144b27ebABA71F9126611a23A31C9",
+    v21FactoryStartBlock: 11499150,
+  },
 };
 
 const network = process.argv.slice(2)[0];
@@ -60,6 +68,11 @@ try {
 
   if (network !== "mainnet") {
     data.dataSources.splice(3, 1);
+  }
+
+  if (network === "matic") {
+    data.dataSources.splice(0, 2);
+    data.templates.splice(0, 2);
   }
 
   let yamlStr = yaml.safeDump(data);
