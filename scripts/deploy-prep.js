@@ -40,7 +40,7 @@ const config = {
     v2FactoryAddress: "",
     v2FactoryStartBlock: "",
     v21FactoryAddress: "0x6690C139564144b27ebABA71F9126611a23A31C9",
-    v21FactoryStartBlock: 11499150,
+    v21FactoryStartBlock: 10397177,
   },
 };
 

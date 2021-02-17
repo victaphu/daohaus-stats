@@ -15,56 +15,6 @@ import {
   CallResult
 } from "@graphprotocol/graph-ts";
 
-export class SummonComplete extends EthereumEvent {
-  get params(): SummonComplete__Params {
-    return new SummonComplete__Params(this);
-  }
-}
-
-export class SummonComplete__Params {
-  _event: SummonComplete;
-
-  constructor(event: SummonComplete) {
-    this._event = event;
-  }
-
-  get summoner(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get tokens(): Array<Address> {
-    return this._event.parameters[1].value.toAddressArray();
-  }
-
-  get summoningTime(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get periodDuration(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-
-  get votingPeriodLength(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
-  }
-
-  get gracePeriodLength(): BigInt {
-    return this._event.parameters[5].value.toBigInt();
-  }
-
-  get proposalDeposit(): BigInt {
-    return this._event.parameters[6].value.toBigInt();
-  }
-
-  get dilutionBound(): BigInt {
-    return this._event.parameters[7].value.toBigInt();
-  }
-
-  get processingReward(): BigInt {
-    return this._event.parameters[8].value.toBigInt();
-  }
-}
-
 export class SubmitProposal extends EthereumEvent {
   get params(): SubmitProposal__Params {
     return new SubmitProposal__Params(this);
@@ -391,7 +341,7 @@ export class Withdraw__Params {
   }
 }
 
-export class Moloch__proposalsResult {
+export class V21Moloch__proposalsResult {
   value0: Address;
   value1: Address;
   value2: Address;
@@ -459,7 +409,7 @@ export class Moloch__proposalsResult {
   }
 }
 
-export class Moloch__membersResult {
+export class V21Moloch__membersResult {
   value0: Address;
   value1: BigInt;
   value2: BigInt;
@@ -495,17 +445,17 @@ export class Moloch__membersResult {
   }
 }
 
-export class Moloch extends SmartContract {
-  static bind(address: Address): Moloch {
-    return new Moloch("Moloch", address);
+export class V21Moloch extends SmartContract {
+  static bind(address: Address): V21Moloch {
+    return new V21Moloch("V21Moloch", address);
   }
 
-  proposals(param0: BigInt): Moloch__proposalsResult {
+  proposals(param0: BigInt): V21Moloch__proposalsResult {
     let result = super.call("proposals", [
       EthereumValue.fromUnsignedBigInt(param0)
     ]);
 
-    return new Moloch__proposalsResult(
+    return new V21Moloch__proposalsResult(
       result[0].toAddress(),
       result[1].toAddress(),
       result[2].toAddress(),
@@ -523,7 +473,7 @@ export class Moloch extends SmartContract {
     );
   }
 
-  try_proposals(param0: BigInt): CallResult<Moloch__proposalsResult> {
+  try_proposals(param0: BigInt): CallResult<V21Moloch__proposalsResult> {
     let result = super.tryCall("proposals", [
       EthereumValue.fromUnsignedBigInt(param0)
     ]);
@@ -532,7 +482,7 @@ export class Moloch extends SmartContract {
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Moloch__proposalsResult(
+      new V21Moloch__proposalsResult(
         value[0].toAddress(),
         value[1].toAddress(),
         value[2].toAddress(),
@@ -605,10 +555,10 @@ export class Moloch extends SmartContract {
     return CallResult.fromValue(value[0].toBigInt());
   }
 
-  members(param0: Address): Moloch__membersResult {
+  members(param0: Address): V21Moloch__membersResult {
     let result = super.call("members", [EthereumValue.fromAddress(param0)]);
 
-    return new Moloch__membersResult(
+    return new V21Moloch__membersResult(
       result[0].toAddress(),
       result[1].toBigInt(),
       result[2].toBigInt(),
@@ -618,14 +568,14 @@ export class Moloch extends SmartContract {
     );
   }
 
-  try_members(param0: Address): CallResult<Moloch__membersResult> {
+  try_members(param0: Address): CallResult<V21Moloch__membersResult> {
     let result = super.tryCall("members", [EthereumValue.fromAddress(param0)]);
     if (result.reverted) {
       return new CallResult();
     }
     let value = result.value;
     return CallResult.fromValue(
-      new Moloch__membersResult(
+      new V21Moloch__membersResult(
         value[0].toAddress(),
         value[1].toBigInt(),
         value[2].toBigInt(),
@@ -1549,6 +1499,68 @@ export class SubmitVoteCall__Outputs {
   }
 }
 
+export class InitCall extends EthereumCall {
+  get inputs(): InitCall__Inputs {
+    return new InitCall__Inputs(this);
+  }
+
+  get outputs(): InitCall__Outputs {
+    return new InitCall__Outputs(this);
+  }
+}
+
+export class InitCall__Inputs {
+  _call: InitCall;
+
+  constructor(call: InitCall) {
+    this._call = call;
+  }
+
+  get _summoner(): Array<Address> {
+    return this._call.inputValues[0].value.toAddressArray();
+  }
+
+  get _approvedTokens(): Array<Address> {
+    return this._call.inputValues[1].value.toAddressArray();
+  }
+
+  get _periodDuration(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get _votingPeriodLength(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _gracePeriodLength(): BigInt {
+    return this._call.inputValues[4].value.toBigInt();
+  }
+
+  get _proposalDeposit(): BigInt {
+    return this._call.inputValues[5].value.toBigInt();
+  }
+
+  get _dilutionBound(): BigInt {
+    return this._call.inputValues[6].value.toBigInt();
+  }
+
+  get _processingReward(): BigInt {
+    return this._call.inputValues[7].value.toBigInt();
+  }
+
+  get _summonerShares(): Array<BigInt> {
+    return this._call.inputValues[8].value.toBigIntArray();
+  }
+}
+
+export class InitCall__Outputs {
+  _call: InitCall;
+
+  constructor(call: InitCall) {
+    this._call = call;
+  }
+}
+
 export class RagekickCall extends EthereumCall {
   get inputs(): RagekickCall__Inputs {
     return new RagekickCall__Inputs(this);
@@ -1704,63 +1716,5 @@ export class SubmitWhitelistProposalCall__Outputs {
 
   get proposalId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class ConstructorCall extends EthereumCall {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
-  }
-
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
-  }
-}
-
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-
-  get _summoner(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _approvedTokens(): Array<Address> {
-    return this._call.inputValues[1].value.toAddressArray();
-  }
-
-  get _periodDuration(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
-  }
-
-  get _votingPeriodLength(): BigInt {
-    return this._call.inputValues[3].value.toBigInt();
-  }
-
-  get _gracePeriodLength(): BigInt {
-    return this._call.inputValues[4].value.toBigInt();
-  }
-
-  get _proposalDeposit(): BigInt {
-    return this._call.inputValues[5].value.toBigInt();
-  }
-
-  get _dilutionBound(): BigInt {
-    return this._call.inputValues[6].value.toBigInt();
-  }
-
-  get _processingReward(): BigInt {
-    return this._call.inputValues[7].value.toBigInt();
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
   }
 }
