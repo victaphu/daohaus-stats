@@ -42,6 +42,14 @@ const config = {
     v21FactoryAddress: "0x6690C139564144b27ebABA71F9126611a23A31C9",
     v21FactoryStartBlock: 10397177,
   },
+  harmonyTest: {
+    v1FactoryAddress: "0x10D52A3A9395650BeB6c4b6217A4E789A409C3C3",
+    v1FactoryStartBlock: 15497036,
+    v2FactoryAddress: "0x0000000000000000000000000000000000000000",
+    v2FactoryStartBlock: 0,
+    v21FactoryAddress: "0xFB6043369DB469E6F3998eA706DF80c9B9aB8De2",
+    v21FactoryStartBlock: 15496997,
+  },
 };
 
 const network = process.argv.slice(2)[0];

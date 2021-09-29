@@ -3,12 +3,66 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: V21Factory
-    network: matic
+    name: V1Factory
+    network: harmonyTest
     source:
-      address: '0x6690C139564144b27ebABA71F9126611a23A31C9'
+      address: '0x10D52A3A9395650BeB6c4b6217A4E789A409C3C3'
+      abi: V1Factory
+      startBlock: 15497036
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - Register
+      abis:
+        - name: V1Factory
+          file: ./abis/V1Factory.json
+        - name: V1Moloch
+          file: ./abis/V1Moloch.json
+      eventHandlers:
+        - event: 'Register(address,indexed address,uint256,string,uint256)'
+          handler: handleRegisterV1
+      file: ./src/factory-mapping.ts
+  - kind: ethereum/contract
+    name: V2Factory
+    network: harmonyTest
+    source:
+      address: '0x0000000000000000000000000000000000000000'
+      abi: V2Factory
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - Register
+      abis:
+        - name: V2Factory
+          file: ./abis/V2Factory.json
+        - name: V2Moloch
+          file: ./abis/V2Moloch.json
+        - name: V21Moloch
+          file: ./abis/V21Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
+      eventHandlers:
+        - event: >-
+            Register(uint256,address,indexed
+            address,address[],uint256,uint256,uint256,uint256,uint256,uint256,uint256,string,uint256)
+          handler: handleRegisterV2
+        - event: Delete(address)
+          handler: handleDeleteV2
+      file: ./src/factory-mapping.ts
+  - kind: ethereum/contract
+    name: V21Factory
+    network: harmonyTest
+    source:
+      address: '0xFB6043369DB469E6F3998eA706DF80c9B9aB8De2'
       abi: V21Factory
-      startBlock: 10397177
+      startBlock: 15496997
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -34,8 +88,103 @@ dataSources:
       file: ./src/factory-mapping.ts
 templates:
   - kind: ethereum/contract
+    name: MolochV1Template
+    network: harmonyTest
+    source:
+      abi: V1Moloch
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/v1-mapping.ts
+      entities:
+        - Moloch
+        - Member
+        - Vote
+        - Proposal
+        - Badge
+      abis:
+        - name: V1Moloch
+          file: ./abis/V1Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
+        - name: Guildbank
+          file: ./abis/V1Guildbank.json
+      eventHandlers:
+        - event: 'SummonComplete(indexed address,uint256)'
+          handler: handleSummonComplete
+        - event: >-
+            SubmitProposal(uint256,indexed address,indexed address,indexed
+            address,uint256,uint256)
+          handler: handleSubmitProposal
+        - event: 'SubmitVote(indexed uint256,indexed address,indexed address,uint8)'
+          handler: handleSubmitVote
+        - event: >-
+            ProcessProposal(indexed uint256,indexed address,indexed
+            address,uint256,uint256,bool)
+          handler: handleProcessProposal
+        - event: 'Ragequit(indexed address,uint256)'
+          handler: handleRagequit
+  - kind: ethereum/contract
+    name: MolochV2Template
+    network: harmonyTest
+    source:
+      abi: V2Moloch
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/v2-mapping.ts
+      entities:
+        - Moloch
+        - TokenBalance
+        - Token
+        - Member
+        - Vote
+        - Proposal
+        - Badge
+      abis:
+        - name: V2Moloch
+          file: ./abis/V2Moloch.json
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: Erc20Bytes32
+          file: ./abis/Erc20Bytes32.json
+      eventHandlers:
+        - event: >-
+            SummonComplete(indexed
+            address,address[],uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSummonComplete
+        - event: >-
+            SubmitProposal(indexed
+            address,uint256,uint256,uint256,address,uint256,address,string,bool[6],uint256,indexed
+            address,indexed address)
+          handler: handleSubmitProposal
+        - event: >-
+            SubmitVote(uint256,indexed uint256,indexed address,indexed
+            address,uint8)
+          handler: handleSubmitVote
+        - event: >-
+            SponsorProposal(indexed address,indexed
+            address,uint256,uint256,uint256)
+          handler: handleSponsorProposal
+        - event: 'ProcessProposal(indexed uint256,indexed uint256,bool)'
+          handler: handleProcessProposal
+        - event: 'ProcessGuildKickProposal(indexed uint256,indexed uint256,bool)'
+          handler: handleProcessGuildKickProposal
+        - event: 'ProcessWhitelistProposal(indexed uint256,indexed uint256,bool)'
+          handler: handleProcessWhitelistProposal
+        - event: 'Withdraw(indexed address,address,uint256)'
+          handler: handleWithdraw
+        - event: 'Ragequit(indexed address,uint256,uint256)'
+          handler: handleRagequit
+        - event: 'TokensCollected(indexed address,uint256)'
+          handler: handleTokensCollected
+  - kind: ethereum/contract
     name: MolochV21Template
-    network: matic
+    network: harmonyTest
     source:
       abi: V21Moloch
     mapping:
